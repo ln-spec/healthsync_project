@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from supabase import Client
 from app.database import get_authenticated_client
 from app.dependencies import require_facility_id
-from app.schemas import PatientCreate, PatientRead, PatientUpdate
+from app.schemas import MedicalRecordCreate, PatientCreate, PatientRead, PatientUpdate, VaccinationCreate
 from app.services.cloudinary_service import create_private_image_url
 
 router = APIRouter(prefix="/patients", tags=["patients"])
@@ -46,9 +46,31 @@ def list_medical_records(patient_id: UUID, client: Client = Depends(get_authenti
     return client.table("medical_records").select("id,patient_id,visit_date,diagnosis,treatment,notes,originating_facility_id,created_at").eq("patient_id", str(patient_id)).order("visit_date", desc=True).execute().data
 
 
+@router.post("/{patient_id}/medical-records", status_code=status.HTTP_201_CREATED)
+def create_medical_record(patient_id: UUID, payload: MedicalRecordCreate, client: Client = Depends(get_authenticated_client), facility_id: str = Depends(require_facility_id)) -> dict:
+    patient = client.table("patients").select("id").eq("id", str(patient_id)).eq("barangay_id", facility_id).limit(1).execute().data
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found or access denied")
+    rows = client.table("medical_records").insert({**payload.model_dump(mode="json"), "patient_id": str(patient_id), "originating_facility_id": facility_id}).execute().data
+    if not rows:
+        raise HTTPException(status_code=500, detail="Medical record could not be created")
+    return rows[0]
+
+
 @router.get("/{patient_id}/vaccinations")
 def list_vaccinations(patient_id: UUID, client: Client = Depends(get_authenticated_client)) -> list[dict]:
     return client.table("vaccination_logs").select("id,patient_id,vaccine_name,dose_number,date_administered,next_due_date,facility_id").eq("patient_id", str(patient_id)).order("date_administered", desc=True).execute().data
+
+
+@router.post("/{patient_id}/vaccinations", status_code=status.HTTP_201_CREATED)
+def create_vaccination(patient_id: UUID, payload: VaccinationCreate, client: Client = Depends(get_authenticated_client), facility_id: str = Depends(require_facility_id)) -> dict:
+    patient = client.table("patients").select("id").eq("id", str(patient_id)).eq("barangay_id", facility_id).limit(1).execute().data
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found or access denied")
+    rows = client.table("vaccination_logs").insert({**payload.model_dump(mode="json"), "patient_id": str(patient_id), "facility_id": facility_id}).execute().data
+    if not rows:
+        raise HTTPException(status_code=500, detail="Vaccination could not be created")
+    return rows[0]
 
 
 @router.get("/{patient_id}/diagnostic-images")

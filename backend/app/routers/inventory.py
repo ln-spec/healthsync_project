@@ -2,9 +2,20 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from supabase import Client
 from app.database import get_authenticated_client
 from app.dependencies import require_facility_id
-from app.schemas import InventoryAdjustment
+from app.schemas import InventoryAdjustment, InventoryCreate
 
 router = APIRouter(prefix="/inventory", tags=["inventory"])
+
+
+@router.post("", status_code=201)
+def create_inventory_item(payload: InventoryCreate, client: Client = Depends(get_authenticated_client), facility_id: str = Depends(require_facility_id)) -> dict:
+    try:
+        rows = client.table("medicine_inventory").insert({**payload.model_dump(), "facility_id": facility_id}).execute().data
+    except Exception as exc:
+        raise HTTPException(status_code=409, detail="Medicine already exists or inventory entry is invalid") from exc
+    if not rows:
+        raise HTTPException(status_code=500, detail="Inventory item could not be created")
+    return rows[0]
 
 
 @router.get("")

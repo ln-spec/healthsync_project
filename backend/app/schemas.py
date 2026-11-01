@@ -30,6 +30,24 @@ class PatientRead(BaseModel):
 class InventoryAdjustment(BaseModel):
     delta: int = Field(description="Signed stock adjustment; negative values represent dispensing")
 
+class InventoryCreate(BaseModel):
+    medicine_name: str = Field(min_length=1, max_length=200)
+    stock_quantity: int = Field(ge=0)
+    reorder_threshold: int = Field(ge=0)
+
+
+class MedicalRecordCreate(BaseModel):
+    visit_date: datetime
+    diagnosis: str | None = Field(default=None, max_length=2000)
+    treatment: str | None = Field(default=None, max_length=4000)
+    notes: str | None = Field(default=None, max_length=8000)
+
+
+class VaccinationCreate(BaseModel):
+    vaccine_name: str = Field(min_length=1, max_length=200)
+    dose_number: int = Field(ge=1)
+    date_administered: date
+    next_due_date: date | None = None
 
 class InventoryRead(BaseModel):
     id: str

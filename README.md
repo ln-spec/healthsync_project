@@ -8,6 +8,11 @@ backend/   FastAPI API and integrations
   app/services/   Cloudinary client
   requirements.txt
   .env
+frontend/   Next.js + TypeScript + Tailwind
+  src/app/   Pages and layout
+  src/lib/   Supabase/API helpers
+  package.json
+  .env.example
 ```
 
 ## Setup
@@ -18,3 +23,8 @@ backend/   FastAPI API and integrations
    pip install -r requirements.txt
    uvicorn app.main:app --reload
 ```
+```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
