@@ -5,7 +5,14 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!baseUrl) throw new Error("NEXT_PUBLIC_API_BASE_URL is required");
   const authHeaders = await getApiHeaders();
   const response = await fetch(`${baseUrl}${path}`, { ...init, headers: { ...authHeaders, ...init.headers } });
-  if (!response.ok) throw new Error(`HealthSync API error (${response.status})`);
+  if (!response.ok) {
+    let detail = "";
+    try {
+      const body = await response.json() as { detail?: string; message?: string };
+      detail = body.detail || body.message || "";
+    } catch { /* Keep the status when the API response has no JSON body. */ }
+    throw new Error(detail || `HealthSync API error (${response.status})`);
+  }
   return response.json() as Promise<T>;
 }
 
