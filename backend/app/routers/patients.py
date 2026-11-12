@@ -17,8 +17,8 @@ def list_upcoming_vaccinations(days: int = Query(default=30, ge=1, le=180), clie
 
 
 @router.get("", response_model=list[PatientRead])
-def list_patients(q: str | None = Query(default=None, max_length=100), limit: int = Query(default=50, ge=1, le=100), client: Client = Depends(get_authenticated_client), facility_id: str = Depends(require_facility_id)) -> list[PatientRead]:
-    query = client.table("patients").select("*").eq("barangay_id", facility_id).order("created_at", desc=True).limit(limit)
+def list_patients(q: str | None = Query(default=None, max_length=100), limit: int = Query(default=50, ge=1, le=100), offset: int = Query(default=0, ge=0), client: Client = Depends(get_authenticated_client), facility_id: str = Depends(require_facility_id)) -> list[PatientRead]:
+    query = client.table("patients").select("*").eq("barangay_id", facility_id).order("created_at", desc=True).range(offset, offset + limit - 1)
     if q:
         query = query.ilike("full_name", f"%{q}%")
     return [PatientRead.model_validate(row) for row in query.execute().data]
