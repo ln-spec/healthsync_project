@@ -3,8 +3,10 @@ from supabase import Client
 from app.database import get_authenticated_client
 from app.dependencies import require_facility_id
 from app.schemas import InventoryAdjustment, InventoryCreate
+import logging
 
 router = APIRouter(prefix="/inventory", tags=["inventory"])
+log = logging.getLogger(__name__)
 
 
 @router.post("", status_code=201)
@@ -37,5 +39,18 @@ def adjust_stock(item_id: str, payload: InventoryAdjustment, client: Client = De
     if not rows:
         raise HTTPException(status_code=500, detail="Inventory update failed")
     result = rows[0]
+    if payload.delta:
+        # Movement log feeds the monthly report's medicine consumption. A logging failure
+        # (e.g. migration not yet applied) must not undo a stock change that already succeeded.
+        try:
+            client.table("inventory_movements").insert({
+                "inventory_id": item_id,
+                "facility_id": facility_id,
+                "delta": payload.delta,
+                "resulting_quantity": quantity,
+            }).execute()
+        except Exception:
+            log.exception("Could not log inventory movement for item %s", item_id)
+
     result["low_stock"] = result["stock_quantity"] <= result["reorder_threshold"]
     return result

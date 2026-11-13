@@ -25,7 +25,34 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
   return response.json() as Promise<T>;
 }
+async function readError(response: Response, path: string): Promise<string> {
+  try {
+    const body = await response.json() as { detail?: string | Array<{ msg?: string }>; message?: string };
+    if (typeof body.detail === "string") return body.detail;
+    if (Array.isArray(body.detail) && body.detail[0]?.msg) return body.detail[0].msg;
+    if (body.message) return body.message;
+  } catch { /* Keep the status when the API response has no JSON body. */ }
+  return `HealthSync API error (${response.status}) for ${path}`;
+}
 
+/** Authenticated file download: fetches with the bearer token, then saves the blob via a temporary link. Returns the saved filename. */
+export async function downloadFile(path: string, fallbackName: string): Promise<string> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!baseUrl) throw new Error("NEXT_PUBLIC_API_BASE_URL is required");
+  const response = await fetch(`${baseUrl}${path}`, { headers: await getApiHeaders() });
+  if (!response.ok) throw new Error(await readError(response, path));
+  const disposition = response.headers.get("Content-Disposition") ?? "";
+  const filename = /filename="?([^";]+)"?/i.exec(disposition)?.[1] ?? fallbackName;
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return filename;
+}
 export interface Patient {
   id: string;
   full_name: string;
