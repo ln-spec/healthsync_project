@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from supabase import Client
+from app.config import get_settings
 from app.database import get_authenticated_client
 from app.dependencies import require_facility_id
 from app.schemas import MedicalRecordCreate, PatientCreate, PatientRead, PatientUpdate, VaccinationCreate
@@ -76,6 +77,9 @@ def create_vaccination(patient_id: UUID, payload: VaccinationCreate, client: Cli
 @router.get("/{patient_id}/diagnostic-images")
 def list_diagnostic_images(patient_id: UUID, client: Client = Depends(get_authenticated_client)) -> list[dict]:
     rows = client.table("diagnostic_images").select("id,cloudinary_public_id,image_format,uploaded_at,facility_id").eq("patient_id", str(patient_id)).order("uploaded_at", desc=True).execute().data
+    settings = get_settings()
+    if rows and not all((settings.cloudinary_cloud_name, settings.cloudinary_api_key, settings.cloudinary_api_secret)):
+        raise HTTPException(status_code=503, detail="Cloudinary is not configured; diagnostic images are unavailable.")
     return [{"id": row["id"], "image_url": create_private_image_url(row["cloudinary_public_id"], row["image_format"]), "uploaded_at": row["uploaded_at"], "facility_id": row["facility_id"]} for row in rows]
 
 

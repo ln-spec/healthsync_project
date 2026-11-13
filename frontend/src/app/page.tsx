@@ -1,29 +1,138 @@
 import Link from "next/link";
-import { Activity, ArrowRight, Bell, ClipboardPlus, Pill, ShieldCheck, Users, Warehouse } from "lucide-react";
+import Image from "next/image";
+import {
+  Activity,
+  ArrowRight,
+  ClipboardPlus,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import AuthControl from "@/components/AuthControl";
 
-export default function HomePage() {
-  return <main className="min-h-screen overflow-hidden bg-canvas">
-    <nav className="mx-auto flex max-w-7xl items-center justify-between rounded-b-2xl bg-blue px-6 py-5 text-white"><Link href="/" className="flex items-center gap-2 text-xl font-bold"><span className="grid size-9 place-items-center rounded-xl bg-canvas text-blue"><Activity size={20}/></span>HealthSync</Link><div className="flex items-center gap-3"><AuthControl inverse/><Link href="/dashboard" className="rounded-full bg-canvas px-5 py-2.5 text-sm font-semibold text-blue">Open dashboard <ArrowRight className="ml-1 inline" size={16}/></Link></div></nav>
-    <section className="mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-12 md:grid-cols-[.9fr_1.1fr] md:pt-20">
-      <div className="rounded-3xl bg-blue p-8 text-white shadow-card md:p-10"><div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-canvas/10 px-3 py-1.5 text-xs font-semibold"><ShieldCheck size={15}/> Care coordination built for communities</div><h1 className="max-w-2xl text-5xl font-bold leading-[1.08] tracking-tight md:text-6xl">Community care,<br/><span className="text-canvas">connected.</span></h1><p className="mt-6 max-w-xl text-lg leading-8 text-white/80">A secure workspace for barangay health teams to keep patient histories, visit activity, and essential medicines in sync.</p><div className="mt-9 flex flex-wrap gap-3"><Link href="/dashboard" className="rounded-full bg-canvas px-6 py-3 font-semibold text-blue shadow-card">Go to dashboard <ArrowRight className="ml-2 inline" size={17}/></Link><a href="#features" className="rounded-full border border-white/40 px-6 py-3 font-semibold text-white hover:bg-canvas/10">Explore platform</a></div></div>
-      <DashboardPreview/>
-    </section>
-    <section id="features" className="border-t border-black/10 bg-canvas py-16"><div className="mx-auto grid max-w-7xl gap-5 px-6 md:grid-cols-3"><Feature title="One patient story" copy="Find visit notes and treatment history in a clear, useful timeline." icon={<ClipboardPlus/>}/><Feature title="Facility visit feed" copy="See recent patient visits and follow activity across your facility." icon={<Activity/>}/><Feature title="Public health signals" copy="Review recorded diagnosis trends and changes that may need follow-up." icon={<Users/>}/></div></section>
-    <footer className="py-8 text-center text-xs text-blue">HealthSync · Community care, connected</footer>
-  </main>;
+export default function HomePage() {  return (
+    <main className="min-h-screen overflow-hidden bg-white">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+        <Link href="/" className="flex items-center gap-3 text-xl font-bold text-blue">
+          <span className="grid size-10 place-items-center rounded-2xl bg-blue text-white shadow-card">
+            <Activity size={20} />
+          </span>
+          HealthSync
+        </Link>
+        <div className="flex items-center gap-3">
+          <AuthControl showSignUp={false} />
+          <Link
+            href="/dashboard"
+            className="rounded-full bg-blue px-5 py-2.5 text-sm font-semibold text-white shadow-card transition hover:bg-blue/90"
+          >
+            Open dashboard <ArrowRight className="ml-1 inline" size={16} />
+          </Link>
+        </div>
+      </nav>
+      <section className="relative mx-auto grid max-w-7xl items-center gap-10 px-6 pb-20 pt-10 md:grid-cols-[.9fr_1.1fr] md:gap-16 md:pb-28 md:pt-14">
+        <div className="relative z-10 py-4 md:py-10">
+          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-blue/10 bg-blue/[0.06] px-4 py-2 text-sm font-semibold text-blue">
+            <ShieldCheck size={16} /> Care that brings us together
+          </div>
+          <h1 className="max-w-2xl text-5xl font-bold leading-[1.06] tracking-tight text-ink md:text-7xl">
+            Community care,
+            <br />
+            <span className="text-blue">connected.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 md:text-xl">
+            A secure workspace for barangay health teams to keep patient
+            histories, visit activity, and essential medicines in sync.
+          </p>
+          <div className="mt-9 flex flex-wrap gap-3">
+            <Link
+              href="/dashboard"
+              className="rounded-full bg-blue px-6 py-3.5 font-semibold text-white shadow-card transition hover:-translate-y-0.5 hover:bg-blue/90"
+            >
+              Go to dashboard <ArrowRight className="ml-2 inline" size={17} />
+            </Link>
+            <a
+              href="#features"
+              className="rounded-full border border-slate-200 px-6 py-3.5 font-semibold text-slate-700 transition hover:border-blue/30 hover:bg-blue/[0.04]"
+            >
+              Explore platform
+            </a>
+          </div>
+          <div className="mt-10 flex items-center gap-3 text-sm text-slate-500">
+            <span className="grid size-9 place-items-center rounded-full bg-emerald-50 text-emerald-700">
+              <ShieldCheck size={18} />
+            </span>
+            Thoughtfully designed for community health teams
+          </div>
+        </div>
+        <div className="relative min-h-[420px] overflow-hidden rounded-[2rem] border border-sky-100 bg-[#c9e8f5] shadow-[0_28px_80px_rgba(15,71,112,0.16)] md:min-h-[580px]">
+          <Image
+            src="/images/PIC.jpg"
+            alt="Illustration celebrating community healthcare workers"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-contain"
+          />
+          <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/90 px-4 py-2.5 text-sm font-semibold text-slate-800 shadow-lg backdrop-blur">
+            <span className="size-2 rounded-full bg-emerald-500" />
+            Healthier communities, together
+          </div>
+        </div>
+      </section>
+      <section id="features" className="bg-white py-20 md:py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-10 max-w-2xl md:mb-12">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-blue">
+              Made for your team
+            </p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+              The right care starts with being in sync.
+            </h2>
+            <p className="mt-4 leading-7 text-slate-600">
+              Keep essential health information clear, connected, and easy to
+              follow up.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            <Feature
+              title="One patient story"
+              copy="Find visit notes and treatment history in a clear, useful timeline."
+              icon={<ClipboardPlus />}
+            />
+            <Feature
+              title="Facility visit feed"
+              copy="See recent patient visits and follow activity across your facility."
+              icon={<Activity />}
+            />
+            <Feature
+              title="Public health signals"
+              copy="Review recorded diagnosis trends and changes that may need follow-up."
+              icon={<Users />}
+            />
+          </div>
+        </div>
+      </section>
+      <footer className="border-t border-slate-100 bg-white px-6 py-8 text-center text-sm text-slate-500">
+        <span className="font-semibold text-blue">HealthSync</span> · Community care, connected
+      </footer>
+    </main>
+  );
 }
-
-function DashboardPreview() {
-  return <div className="rounded-[2rem] border border-black/10 bg-white p-5 shadow-card md:p-7"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-sm text-black/60">Dashboard preview</p><h2 className="mt-1 text-xl font-bold">Today at a glance</h2></div><span className="rounded-full bg-canvas px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-blue">Sample data</span></div>
-    <div className="mt-5 grid grid-cols-2 gap-3"><Metric icon={<Users size={17}/>} label="Patient records" value="248" note="Sample count"/><Metric icon={<Activity size={17}/>} label="Visits today" value="12" note="Sample count"/><Metric icon={<Warehouse size={17}/>} label="Medicine types" value="18" note="In facility"/><Metric icon={<ClipboardPlus size={17}/>} label="Patients seen" value="96" note="Last 30 days"/></div>
-    <div className="mt-4 grid gap-4 sm:grid-cols-2"><div className="rounded-2xl border border-black/10 bg-canvas p-4"><div className="flex items-center justify-between"><div><h3 className="text-sm font-bold">Available medicine</h3><p className="mt-1 text-[11px] text-black/60">Current stock count</p></div><Pill className="text-blue" size={18}/></div><StockRow name="Amlodipine 5 mg" count="8 in stock"/><StockRow name="Paracetamol 500 mg" count="42 in stock"/></div>
-      <div className="rounded-2xl border border-black/10 bg-canvas p-4"><div className="flex items-center justify-between"><div><h3 className="text-sm font-bold">Recent patient visits</h3><p className="mt-1 text-[11px] text-black/60">Latest facility activity</p></div><Bell className="text-blue" size={18}/></div><VisitRow name="Sample Patient A" detail="Respiratory symptoms · Today"/><VisitRow name="Sample Patient B" detail="Follow-up visit · Yesterday"/></div></div>
-    <div className="mt-4 rounded-2xl bg-blue p-4 text-white"><div className="flex flex-wrap items-center justify-between gap-2"><div><p className="text-[11px] text-white/70">PUBLIC HEALTH MONITORING</p><h3 className="mt-1 font-semibold">Visit trends for review</h3></div><span className="rounded-full bg-canvas/10 px-3 py-1 text-xs">30 day view</span></div><div className="mt-3 flex items-end gap-1.5" aria-label="Illustrative weekly visit activity"><i className="h-5 flex-1 rounded-t bg-canvas/50"/><i className="h-8 flex-1 rounded-t bg-canvas/60"/><i className="h-6 flex-1 rounded-t bg-canvas/50"/><i className="h-11 flex-1 rounded-t bg-canvas/80"/><i className="h-9 flex-1 rounded-t bg-canvas/70"/><i className="h-14 flex-1 rounded-t bg-canvas"/></div><p className="mt-3 text-[10px] leading-4 text-white/70">Illustrative only. Trends are reviewed by health staff and do not confirm an outbreak.</p></div>
-  </div>;
+function Feature({
+  title,
+  copy,
+  icon,
+}: {
+  title: string;
+  copy: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <article className="group rounded-2xl border border-slate-200/80 bg-white p-7 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-blue/20 hover:shadow-xl">
+      <span className="grid size-12 place-items-center rounded-2xl bg-blue/[0.07] text-blue transition group-hover:bg-blue group-hover:text-white">
+        {icon}
+      </span>
+      <h3 className="mt-5 font-bold text-slate-900">{title}</h3>
+      <p className="mt-2 text-sm leading-6 text-slate-600">{copy}</p>
+    </article>
+  );
 }
-
-function Metric({ icon, label, value, note }: { icon: React.ReactNode; label: string; value: string; note: string }) { return <div className="rounded-xl border border-black/10 bg-canvas p-3"><span className="grid size-8 place-items-center rounded-lg bg-white text-blue">{icon}</span><p className="mt-3 text-[11px] text-black/60">{label}</p><div className="mt-1 flex items-baseline justify-between gap-1"><strong className="text-2xl">{value}</strong><span className="text-[9px] text-black/40">{note}</span></div></div>; }
-function StockRow({ name, count }: { name: string; count: string }) { return <div className="mt-3 flex items-center justify-between gap-2 border-t border-black/10 pt-2.5 text-[11px]"><span className="truncate">{name}</span><span className="shrink-0 font-semibold text-blue">{count}</span></div>; }
-function VisitRow({ name, detail }: { name: string; detail: string }) { return <div className="mt-3 border-t border-black/10 pt-2.5"><p className="text-[11px] font-semibold">{name}</p><p className="mt-0.5 text-[10px] text-black/60">{detail}</p></div>; }
-function Feature({ title, copy, icon }: { title: string; copy: string; icon: React.ReactNode }) { return <article className="rounded-2xl border border-black/10 bg-white p-6"><span className="grid size-11 place-items-center rounded-xl bg-canvas text-blue">{icon}</span><h3 className="mt-5 font-bold">{title}</h3><p className="mt-2 text-sm leading-6 text-black/60">{copy}</p></article>; }
