@@ -17,3 +17,5 @@ frontend/.env.local
 
 # OS Files
 Thumbs.db
+venv/
+backend/venv/

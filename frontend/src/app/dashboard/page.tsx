@@ -20,6 +20,7 @@ import {
 } from "@/lib/api";
 import AuthControl from "@/components/AuthControl";
 import EntryForms from "@/components/EntryForms";
+import MonthlyReportButton from "@/components/MonthlyReportButton";
 
 export default function DashboardPage() {
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -373,6 +374,7 @@ export default function DashboardPage() {
           analytics={analytics}
           analyticsError={analyticsError}
         />
+        <MonthlyReportButton/>
       </div>
     </main>
   );
