@@ -12,7 +12,7 @@ frontend/   Next.js + TypeScript + Tailwind
   src/app/   Pages and layout
   src/lib/   Supabase/API helpers
   package.json
-  .env.example
+  .env.local
 ```
 
 ## Setup
