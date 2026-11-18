@@ -31,7 +31,7 @@ export default function MonthlyReportButton() {
     }
   }
 
-  return <section className="mt-7 rounded-2xl border border-black/10 bg-canvas p-6 shadow-card">
+  return <section id="monthly-report" className="mt-7 scroll-mt-6 rounded-2xl border border-black/10 bg-canvas p-6 shadow-card">
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
         <div className="flex items-center gap-2"><FileSpreadsheet className="text-blue" size={20}/><h2 className="text-lg font-bold">Monthly report export</h2></div>

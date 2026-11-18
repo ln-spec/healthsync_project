@@ -2,9 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Activity,
-  ArrowRight,
   ClipboardPlus,
-  ShieldCheck,
   Users,
 } from "lucide-react";
 import AuthControl from "@/components/AuthControl";
@@ -19,13 +17,7 @@ export default function HomePage() {  return (
           HealthSync
         </Link>
         <div className="flex items-center gap-3">
-          <AuthControl showSignUp={false} />
-          <Link
-            href="/dashboard"
-            className="rounded-full bg-blue px-5 py-2.5 text-sm font-semibold text-white shadow-card transition hover:bg-blue/90"
-          >
-            Open dashboard <ArrowRight className="ml-1 inline" size={16} />
-          </Link>
+          <AuthControl showSignUp={false} showDashboardLink />
         </div>
       </nav>
       <section className="relative mx-auto grid max-w-7xl items-center gap-10 px-6 pb-20 pt-10 md:grid-cols-[.9fr_1.1fr] md:gap-16 md:pb-28 md:pt-14">
@@ -44,7 +36,7 @@ export default function HomePage() {  return (
 
           <div className="relative w-full h-[24rem] md:h-[36rem] overflow-hidden rounded-2xl">
             <Image
-              src="/images/barangay.jpg"
+              src="/images/brgy.jpg"
               alt=""
               fill
               priority
@@ -72,18 +64,18 @@ export default function HomePage() {  return (
           </div>
           <div className="grid gap-3 md:grid-cols-3">
             <Feature
-              title="One patient story"
-              copy="Find visit notes and treatment history in a clear, useful timeline."
+              title="Barangay Health Workers"
+              copy="The system allows health workers to search patient profiles quickly and record consultations digitally. This reduces manual paperwork and speeds up monthly administrative reporting."
               icon={<ClipboardPlus />}
             />
             <Feature
-              title="Facility visit feed"
-              copy="See recent patient visits and follow activity across your facility."
+              title="Municipal Health Officers and Local Government Units"
+              copy="The platform enables health officers and local government units to monitor disease trends and track medicine inventory across all barangays using a centralized analytics dashboard. This helps city officials distribute medical supplies efficiently, plan health budgets accurately, and execute proactive health responses."
               icon={<Activity />}
             />
             <Feature
-              title="Public health signals"
-              copy="Review recorded diagnosis trends and changes that may need follow-up."
+              title="Barangay Residents and Patients."
+              copy="Barangay residents and patients benefit from shorter waiting times during health consultations. Their vaccination and consultation records remain accessible across local health stations helping ensure they receive quick care and essential medicines."
               icon={<Users />}
             />
           </div>

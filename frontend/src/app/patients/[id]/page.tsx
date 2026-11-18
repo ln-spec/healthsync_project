@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { ChangeEvent, useEffect, useState } from "react";
 import {
@@ -237,9 +238,9 @@ export default function PatientPage() {
                     records.map((record) => (
                       <article
                         key={record.id}
-                        className="relative border-l-2 border-teal/20 pl-5"
+                        className="relative border-l-2 border-accent/40 pl-5"
                       >
-                        <span className="absolute -left-[7px] top-1 size-3 rounded-full bg-teal" />
+                        <span className="absolute -left-[7px] top-1 size-3 rounded-full bg-accent" />
                         <p className="text-xs font-semibold text-blue">
                           {new Date(record.visit_date).toLocaleDateString()}
                         </p>
@@ -306,7 +307,7 @@ export default function PatientPage() {
                     </div>
                     <FileImage className="text-blue" />
                   </div>
-                  <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-teal/40 bg-mint/40 px-4 py-4 text-sm font-semibold text-blue hover:bg-mint">
+                  <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-accent/60 bg-accent/10 px-4 py-4 text-sm font-semibold text-blue hover:bg-accent/20">
                     <Upload size={17} /> {uploading ? "Uploading image…" : "Choose image"}
                     <input
                       type="file"
@@ -348,9 +349,12 @@ export default function PatientPage() {
                             rel="noreferrer"
                             className="group overflow-hidden rounded-xl border border-black/10 bg-white focus:outline-none focus:ring-2 focus:ring-blue"
                           >
-                            <img
+                            <Image
                               src={image.image_url}
                               alt={`Diagnostic upload from ${new Date(image.uploaded_at).toLocaleDateString()}`}
+                              width={400}
+                              height={400}
+                              unoptimized
                               className="aspect-square w-full object-cover transition group-hover:scale-[1.02]"
                             />
                             <p className="truncate px-3 py-2 text-xs text-black/60">

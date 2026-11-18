@@ -7,7 +7,10 @@ const config: Config = {
         blue: "#0038FF",
         ink: "#000000",
         mint: "#FFFFFF",
-        teal: "#0038FF",
+        accent: {
+          DEFAULT: "#80C98B",
+          strong: "#286B42",
+        },
         canvas: "#FFFFFF",
       },
       boxShadow: { card: "0 12px 40px rgba(0,56,255,.08)" },

@@ -7,8 +7,9 @@ import {
   Activity,
   ArrowUpRight,
   Bell,
+  FileSpreadsheet,
+  MapPin,
   Search,
-  ShieldCheck,
   Users,
   Warehouse,
 } from "lucide-react";
@@ -121,8 +122,8 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <header className="border-b border-blue/20 bg-blue">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <header className="relative z-50 border-b border-blue/20 bg-blue">
+        <div className="flex w-full items-center justify-between px-4 py-4 sm:px-6">
           <Link
             href="/"
             className="flex items-center gap-2 text-lg font-bold text-white"
@@ -133,9 +134,22 @@ export default function DashboardPage() {
             HealthSync
           </Link>
           <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-white/80 sm:block">
-              {barangayName ? `${barangayName} health workspace` : "Barangay health workspace"}
-            </span>
+            {barangayName && (
+              <div
+                title={barangayName}
+                className="hidden items-center gap-2 rounded-xl bg-white px-3 py-1.5 text-blue shadow-sm sm:flex"
+              >
+                <MapPin className="shrink-0 text-accent" size={17} />
+                <div className="leading-tight">
+                  <p className="text-[9px] font-semibold uppercase tracking-wider text-black/50">
+                    Assigned barangay
+                  </p>
+                  <p className="max-w-40 truncate text-sm font-bold">
+                    {barangayName}
+                  </p>
+                </div>
+              </div>
+            )}
             <div className="relative">
               <button
                 aria-label={`Low stock notifications: ${lowStock.length}`}
@@ -145,7 +159,7 @@ export default function DashboardPage() {
               >
                 <Bell size={18} />
                 {lowStock.length > 0 && (
-                  <span className="absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-blue px-1 text-[10px] font-bold text-white">
+                  <span className="absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-accent-strong px-1 text-[10px] font-bold text-white">
                     {lowStock.length}
                   </span>
                 )}
@@ -162,7 +176,7 @@ export default function DashboardPage() {
                     <button
                       onClick={() => setNotificationsOpen(false)}
                       aria-label="Close notifications"
-                      className="rounded-lg px-2 py-1 text-sm text-blue hover:bg-white"
+                      className="rounded-lg px-2 py-1 text-sm text-accent-strong hover:bg-white"
                     >
                       ×
                     </button>
@@ -177,7 +191,7 @@ export default function DashboardPage() {
                           <span className="truncate text-sm font-medium">
                             {item.medicine_name}
                           </span>
-                          <span className="shrink-0 text-xs font-semibold text-blue">
+                          <span className="shrink-0 text-xs font-semibold text-accent-strong">
                             {item.stock_quantity} left
                           </span>
                         </div>
@@ -191,210 +205,256 @@ export default function DashboardPage() {
                 </section>
               )}
             </div>
-            <AuthControl inverse showSignUp={false} />
           </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-6 py-9">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium text-teal">Community care</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight">
-              Hi! Health Worker.
-            </h1>
-            <p className="mt-2 text-sm text-black/60">
-              How may I help you today?
-            </p>
-          </div>
-          <EntryForms onSaved={refresh} />
+      <aside className="mb-6 rounded-2xl border border-black/10 bg-canvas p-4 shadow-card lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:mb-0 lg:flex lg:w-56 lg:flex-col lg:overflow-y-auto lg:rounded-none lg:border-y-0 lg:border-l-0 lg:border-r lg:p-4 lg:shadow-none">
+        <Link
+          href="/"
+          className="mb-5 hidden items-center gap-2.5 border-b border-black/10 pb-4 lg:flex"
+        >
+          <span className="grid size-8 place-items-center rounded-lg bg-blue/10 text-blue">
+            <Activity size={17} />
+          </span>
+          <span className="text-base font-bold text-blue">HealthSync</span>
+        </Link>
+        <nav
+          aria-label="Dashboard sections"
+          className="flex gap-2 overflow-x-auto lg:flex-col lg:gap-3 lg:overflow-visible"
+        >
+          {[
+            { id: "patient-records", label: "Patient records", icon: <Users size={17} /> },
+            { id: "patient-lookup", label: "Patient lookup & available medicine", icon: <Search size={17} /> },
+            { id: "recent-visits", label: "Recent patient visits", icon: <Activity size={17} /> },
+            { id: "facility-overview", label: "Facility overview", icon: <Warehouse size={17} /> },
+            { id: "monthly-report", label: "Monthly report export", icon: <FileSpreadsheet size={17} /> },
+          ].map(({ id, label, icon }) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              className="group flex shrink-0 items-center gap-2 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-black/70 transition hover:border-accent/40 hover:bg-accent/[0.14] hover:text-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-strong lg:w-full lg:whitespace-normal lg:px-3 lg:py-2.5"
+            >
+              <span className="shrink-0 text-accent transition group-hover:text-accent">
+                {icon}
+              </span>
+              <span>{label}</span>
+            </a>
+          ))}
+        </nav>
+        <div className="mt-4 border-t border-black/10 pt-4 lg:mt-auto">
+          <AuthControl showSignUp={false} />
         </div>
-        {error && (
-          <div
-            role="status"
-            className="mt-6 rounded-xl border border-blue/20 bg-canvas p-4 text-sm text-black"
-          >
-            {error}
-          </div>
-        )}
-        <section className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat
-            icon={<Users />}
-            label="Patient records"
-            value={String(patients.length)}
-            detail="Recent records"
-          />
-          <Stat
-            icon={<Warehouse />}
-            label="Medicine types"
-            value={String(inventory.length)}
-            detail="Available in facility"
-          />
-          <Stat
-            icon={<Activity />}
-            label="Visits today"
-            value={visitsToday === null ? "—" : String(visitsToday)}
-            detail="Visit date · Manila time"
-          />
-          <Stat
-            icon={<Users />}
-            label="Patients seen"
-            value={analytics ? String(analytics.unique_patients) : "—"}
-            detail="Unique patients · last 30 days"
-          />
-        </section>
+      </aside>
 
-        <div className="mt-7 grid gap-6 lg:grid-cols-[1.3fr_.7fr]">
-          <section className="flex h-[36rem] min-h-0 flex-col rounded-2xl border border-black/10 bg-canvas p-6 shadow-card">
-            <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="mx-auto max-w-7xl px-6 py-9 lg:ml-64 lg:mr-auto">
+            <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <h2 className="text-lg font-bold">Patient lookup</h2>
-                <p className="mt-1 text-sm text-black/60">
-                  Search your facility’s patient directory.
+                <p className="text-sm font-medium text-accent-strong">Community care</p>
+                <h1 className="mt-1 text-3xl font-bold tracking-tight">
+                  Hi! Health Worker.
+                </h1>
+                <p className="mt-2 text-sm text-black/60">
+                  How may I help you today?
                 </p>
               </div>
-              <div className="relative">
-                <Search
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40"
-                  size={17}
-                />
-                <input
-                  aria-label="Search patients"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search name"
-                  className="w-56 rounded-xl border border-black/10 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-teal"
-                />
+              <EntryForms onSaved={refresh} />
+            </div>
+            {error && (
+              <div
+                role="status"
+                className="mt-6 rounded-xl border border-accent/40 bg-canvas p-4 text-sm text-black"
+              >
+                {error}
               </div>
-            </div>
-            <div className="mt-5 min-h-0 flex-1 divide-y divide-black/10 overflow-y-auto overscroll-contain pr-1">
-              {filtered.length ? (
-                filtered.map((patient) => (
-                  <Link
-                    href={`/patients/${patient.id}`}
-                    key={patient.id}
-                    className="flex items-center justify-between py-4 hover:bg-white"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="grid size-10 place-items-center rounded-full bg-mint font-semibold text-teal">
-                        {patient.full_name
-                          .split(" ")
-                          .map((part) => part[0])
-                          .slice(0, 2)
-                          .join("")
-                          .toUpperCase()}
-                      </span>
-                      <div>
-                        <div className="flex flex-wrap items-center gap-2"><p className="font-semibold">{patient.full_name}</p><span className="rounded-full bg-blue/10 px-2 py-0.5 text-[10px] font-semibold text-blue">{getPatientAgeGroup(patient.dob)}</span></div>
-                        <p className="text-xs text-black/60">
-                          DOB {patient.dob} · {patient.gender}
-                        </p>
-                      </div>
-                    </div>
-                    <ArrowUpRight size={18} className="text-black/40" />
-                  </Link>
-                ))
-              ) : (
-                <p className="py-8 text-center text-sm text-black/60">
-                  {error
-                    ? "Patient data unavailable"
-                    : "No matching patient records"}
-                </p>
-              )}
-            </div>
-          </section>
-          <section className="rounded-2xl border border-black/10 bg-canvas p-6 shadow-card">
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-lg font-bold">Available medicine</h2>
-                <p className="mt-1 text-sm text-black/60">
-                  Current facility stock counts
-                </p>
-              </div>
-              <Warehouse className="text-teal" />
-            </div>
-            <div className="mt-5 max-h-80 space-y-2 overflow-y-auto">
-              {inventory.length ? (
-                inventory.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-black/10 bg-white px-4 py-3"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold">
-                        {item.medicine_name}
-                      </p>
-                      <p className="mt-1 text-xs text-black/60">
-                        Reorder level: {item.reorder_threshold}
-                      </p>
-                    </div>
-                    <span
-                      className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${item.stock_quantity <= item.reorder_threshold ? "bg-blue/10 text-blue" : "bg-canvas text-black"}`}
-                    >
-                      {item.stock_quantity} in stock
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="rounded-xl bg-white p-4 text-sm text-black/60">
-                  {error
-                    ? "Inventory data unavailable"
-                    : "No medicine has been added yet."}
-                </p>
-              )}
-            </div>
-          </section>
-        </div>
+            )}
+            <section
+              id="patient-records"
+              className="mt-7 scroll-mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              <Stat
+                icon={<Users />}
+                label="Patient records"
+                value={String(patients.length)}
+                detail="Recent records"
+              />
+              <Stat
+                icon={<Warehouse />}
+                label="Medicine types"
+                value={String(inventory.length)}
+                detail="Available in facility"
+              />
+              <Stat
+                icon={<Activity />}
+                label="Visits today"
+                value={visitsToday === null ? "—" : String(visitsToday)}
+                detail="Visit date · Manila time"
+              />
+              <Stat
+                icon={<Users />}
+                label="Patients seen"
+                value={analytics ? String(analytics.unique_patients) : "—"}
+                detail="Unique patients · last 30 days"
+              />
+            </section>
 
-        <section className="mt-7 rounded-2xl border border-black/10 bg-canvas p-6 shadow-card">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-bold">Recent patient visits</h2>
-              <p className="mt-1 text-sm text-black/60">
-                Latest recorded visits at your facility.
-              </p>
-            </div>
-            <span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-blue">
-              Visit feed
-            </span>
-          </div>
-          <div className="mt-4 divide-y divide-black/10">
-            {analytics?.recent_visits.length ? (
-              analytics.recent_visits.map((visit) => (
-                <Link
-                  key={visit.id}
-                  href={`/patients/${visit.patient_id}`}
-                  className="flex flex-wrap items-center justify-between gap-2 py-3 hover:bg-white"
-                >
+            <div
+              id="patient-lookup"
+              className="mt-7 scroll-mt-6 grid gap-6 lg:grid-cols-[1.3fr_.7fr]"
+            >
+              <section className="flex h-[36rem] min-h-0 flex-col rounded-2xl border border-black/10 bg-canvas p-6 shadow-card">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className="font-semibold">{visit.patient_name}</p>
+                    <h2 className="text-lg font-bold">Patient lookup</h2>
                     <p className="mt-1 text-sm text-black/60">
-                      {visit.diagnosis}
+                      Search your facility’s patient directory.
                     </p>
                   </div>
-                  <time className="text-xs text-black/60">
-                    {new Date(visit.visit_date).toLocaleString("en-PH", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                    })}
-                  </time>
-                </Link>
-              ))
-            ) : (
-              <p className="rounded-xl bg-white p-4 text-sm text-black/60">
-                {error
-                  ? "Visit data unavailable."
-                  : "No visits have been recorded in the last 30 days."}
-              </p>
-            )}
-          </div>
-        </section>
+                  <div className="relative">
+                    <Search
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40"
+                      size={17}
+                    />
+                    <input
+                      aria-label="Search patients"
+                      value={search}
+                      onChange={(event) => setSearch(event.target.value)}
+                      placeholder="Search name"
+                      className="w-56 rounded-xl border border-black/10 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-accent-strong"
+                    />
+                  </div>
+                </div>
+                <div className="mt-5 min-h-0 flex-1 divide-y divide-black/10 overflow-y-auto overscroll-contain pr-1">
+                  {filtered.length ? (
+                    filtered.map((patient) => (
+                      <Link
+                        href={`/patients/${patient.id}`}
+                        key={patient.id}
+                        className="flex items-center justify-between py-4 hover:bg-white"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="grid size-10 place-items-center rounded-full bg-accent/15 font-semibold text-accent-strong">
+                            {patient.full_name
+                              .split(" ")
+                              .map((part) => part[0])
+                              .slice(0, 2)
+                              .join("")
+                              .toUpperCase()}
+                          </span>
+                          <div>
+                            <div className="flex flex-wrap items-center gap-2"><p className="font-semibold">{patient.full_name}</p><span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-semibold text-accent-strong">{getPatientAgeGroup(patient.dob)}</span></div>
+                            <p className="text-xs text-black/60">
+                              DOB {patient.dob} · {patient.gender}
+                            </p>
+                          </div>
+                        </div>
+                        <ArrowUpRight size={18} className="text-black/40" />
+                      </Link>
+                    ))
+                  ) : (
+                    <p className="py-8 text-center text-sm text-black/60">
+                      {error
+                        ? "Patient data unavailable"
+                        : "No matching patient records"}
+                    </p>
+                  )}
+                </div>
+              </section>
+              <section className="rounded-2xl border border-black/10 bg-canvas p-6 shadow-card">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-lg font-bold">Available medicine</h2>
+                    <p className="mt-1 text-sm text-black/60">
+                      Current facility stock counts
+                    </p>
+                  </div>
+                  <Warehouse className="text-accent" />
+                </div>
+                <div className="mt-5 max-h-80 space-y-2 overflow-y-auto">
+                  {inventory.length ? (
+                    inventory.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between gap-3 rounded-xl border border-black/10 bg-white px-4 py-3"
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold">
+                            {item.medicine_name}
+                          </p>
+                          <p className="mt-1 text-xs text-black/60">
+                            Reorder level: {item.reorder_threshold}
+                          </p>
+                        </div>
+                        <span
+                          className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${item.stock_quantity <= item.reorder_threshold ? "bg-accent/20 text-accent-strong" : "bg-canvas text-black"}`}
+                        >
+                          {item.stock_quantity} in stock
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="rounded-xl bg-white p-4 text-sm text-black/60">
+                      {error
+                        ? "Inventory data unavailable"
+                        : "No medicine has been added yet."}
+                    </p>
+                  )}
+                </div>
+              </section>
+            </div>
 
-        <PublicHealthPanel
-          analytics={analytics}
-          analyticsError={analyticsError}
-        />
-        <MonthlyReportButton/>
+            <section
+              id="recent-visits"
+              className="mt-7 scroll-mt-6 rounded-2xl border border-black/10 bg-canvas p-6 shadow-card"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-bold">Recent patient visits</h2>
+                  <p className="mt-1 text-sm text-black/60">
+                    Latest recorded visits at your facility.
+                  </p>
+                </div>
+                <span className="rounded-full bg-accent/20 px-3 py-1.5 text-xs font-semibold text-accent-strong">
+                  Visit feed
+                </span>
+              </div>
+              <div className="mt-4 divide-y divide-black/10">
+                {analytics?.recent_visits.length ? (
+                  analytics.recent_visits.map((visit) => (
+                    <Link
+                      key={visit.id}
+                      href={`/patients/${visit.patient_id}`}
+                      className="flex flex-wrap items-center justify-between gap-2 py-3 hover:bg-white"
+                    >
+                      <div>
+                        <p className="font-semibold">{visit.patient_name}</p>
+                        <p className="mt-1 text-sm text-black/60">
+                          {visit.diagnosis}
+                        </p>
+                      </div>
+                      <time className="text-xs text-black/60">
+                        {new Date(visit.visit_date).toLocaleDateString(
+                          "en-PH",
+                          { dateStyle: "medium" },
+                        )}
+                      </time>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="rounded-xl bg-white p-4 text-sm text-black/60">
+                    {error
+                      ? "Visit data unavailable."
+                      : "No visits have been recorded in the last 30 days."}
+                  </p>
+                )}
+              </div>
+            </section>
+
+            <PublicHealthPanel
+              analytics={analytics}
+              analyticsError={analyticsError}
+            />
+            <MonthlyReportButton />
       </div>
     </main>
   );
@@ -412,10 +472,10 @@ function PublicHealthPanel({
     ...(analytics?.weekly_visits.map((week) => week.count) ?? []),
   );
   return (
-    <section className="mt-7 rounded-2xl border border-blue/20 bg-white p-6 shadow-card">
+    <section id="facility-overview" className="mt-7 scroll-mt-6 rounded-2xl border border-accent/40 bg-white p-6 shadow-card">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold text-blue">
+          <p className="text-sm font-semibold text-accent-strong">
             Facility overview · last 30 days
           </p>
           <h2 className="mt-1 text-2xl font-bold">
@@ -477,7 +537,7 @@ function PublicHealthPanel({
                         {week.count}
                       </span>
                       <div
-                        className="w-full max-w-10 rounded-t-md bg-blue"
+                        className="w-full max-w-10 rounded-t-md bg-accent"
                         style={{
                           height: `${Math.max(5, (week.count / peak) * 100)}%`,
                         }}
@@ -518,7 +578,7 @@ function PublicHealthPanel({
                       </div>
                       <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white">
                         <div
-                          className="h-full rounded-full bg-blue"
+                          className="h-full rounded-full bg-accent"
                           style={{
                             width: `${Math.max(4, (diagnosis.count / Math.max(1, analytics.diagnoses[0].count)) * 100)}%`,
                           }}
@@ -534,7 +594,7 @@ function PublicHealthPanel({
               </div>
             </div>
           </div>
-          <div className="mt-6 rounded-xl border border-blue/20 bg-canvas p-5">
+          <div className="mt-6 rounded-xl border border-accent/40 bg-canvas p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h3 className="font-semibold">Increased reports for review</h3>
@@ -543,7 +603,7 @@ function PublicHealthPanel({
                   the prior period.
                 </p>
               </div>
-              <Activity className="shrink-0 text-blue" size={20} />
+              <Activity className="shrink-0 text-accent" size={20} />
             </div>
             {analytics.increased_reports.length ? (
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -553,7 +613,7 @@ function PublicHealthPanel({
                     className="flex items-center justify-between rounded-lg bg-white px-3 py-2 text-sm"
                   >
                     <span className="font-medium">{item.name}</span>
-                    <span className="text-blue">
+                    <span className="text-accent-strong">
                       {item.count} visits · was {item.previous_count}
                     </span>
                   </div>
@@ -571,7 +631,7 @@ function PublicHealthPanel({
             counts. Review signals with a qualified public health professional.
           </p>
           {analytics.record_limit_reached && (
-            <p className="mt-2 text-xs font-medium text-blue">
+            <p className="mt-2 text-xs font-medium text-accent-strong">
               Analytics are based on the most recent 5,000 records in the
               selected window.
             </p>
@@ -614,7 +674,7 @@ function Stat({
     <div className="rounded-2xl border border-black/10 bg-canvas p-5 shadow-card">
       <div className="flex items-center justify-between">
         <span className="text-sm text-black/60">{label}</span>
-        <span className="text-teal">{icon}</span>
+        <span className="text-accent">{icon}</span>
       </div>
       <p className="mt-3 text-3xl font-bold">{value}</p>
       <p className="mt-1 text-xs text-black/40">{detail}</p>

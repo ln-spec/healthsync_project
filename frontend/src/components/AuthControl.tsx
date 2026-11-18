@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogIn, LogOut, X } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, LogIn, LogOut, X } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabase";
 
 type Mode = "Log In"
@@ -10,9 +11,11 @@ type Mode = "Log In"
 export default function AuthControl({
   inverse = false,
   showSignUp = true,
+  showDashboardLink = false,
 }: {
   inverse?: boolean;
   showSignUp?: boolean;
+  showDashboardLink?: boolean;
 }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -83,14 +86,22 @@ export default function AuthControl({
     <>
       {user ? (
         <div className="flex items-center gap-3">
+          {showDashboardLink && (
+            <Link
+              href="/dashboard"
+              className="rounded-full bg-blue px-5 py-2.5 text-sm font-semibold text-white shadow-card transition hover:bg-blue/90"
+            >
+              Go to dashboard <ArrowRight className="ml-1 inline" size={16} />
+            </Link>
+          )}
           <span
-            className={`hidden max-w-40 truncate text-xs md:block ${inverse ? "text-white/80" : "text-black/60"}`}
+            className={`hidden min-w-0 max-w-40 shrink truncate text-xs md:block ${inverse ? "text-white/80" : "text-black/60"}`}
           >
             {user}
           </span>
           <button
             onClick={logOut}
-            className="inline-flex items-center gap-2 rounded-xl border border-black/10 bg-white px-3 py-2 text-sm font-semibold text-blue hover:bg-canvas"
+            className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border border-black/10 bg-white px-3 py-2 text-sm font-semibold text-blue hover:bg-canvas"
           >
             <LogOut size={16} /> Sign out
           </button>

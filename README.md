@@ -18,9 +18,10 @@ frontend/   Next.js + TypeScript + Tailwind
 ## Setup
 ```bash
    cd backend
-   python -m venv .venv or & "C:\Program Files\Python313\python.exe" -m venv .venv or py -3.12 -m venv .venv
+   py -3.13 -m venv .venv
    .venv\\Scripts\\Activate.ps1 (Windows)
-   pip install -r requirements.txt
+   python -m pip install --upgrade pip setuptools wheel
+   python -m pip install -r requirements.txt
    uvicorn app.main:app --reload
 ```
 ```bash

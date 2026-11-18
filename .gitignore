@@ -6,6 +6,7 @@ backend/.env
 # Frontend
 frontend/node_modules/
 frontend/.next/
+frontend/.next-dev-local/
 frontend/.env.local
 
 # PyCharm
