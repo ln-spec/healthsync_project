@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import {
   Activity,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import {
   api,
+  type FacilityInfo,
   type InventoryItem,
   type Patient,
   type PublicHealthAnalytics,
@@ -22,9 +24,12 @@ import AuthControl from "@/components/AuthControl";
 import EntryForms from "@/components/EntryForms";
 import MonthlyReportButton from "@/components/MonthlyReportButton";
 import { getPatientAgeGroup } from "@/lib/patientAgeGroup";
+import { getSupabaseClient } from "@/lib/supabase";
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [barangayName, setBarangayName] = useState("");
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [analytics, setAnalytics] = useState<PublicHealthAnalytics | null>(
     null,
@@ -86,10 +91,27 @@ export default function DashboardPage() {
     );
   }, [loadAllPatients]);
   useEffect(() => {
-    refresh();
-    window.addEventListener("healthsync-auth-change", refresh);
-    return () => window.removeEventListener("healthsync-auth-change", refresh);
-  }, [refresh]);
+    let active = true;
+    const routeByRole = () => {
+      void getSupabaseClient().auth.getSession().then(({ data }) => {
+        if (!active) return;
+        if (data.session?.user.app_metadata?.facility_role === "municipal_admin") {
+          router.replace("/municipal");
+          return;
+        }
+        void api<FacilityInfo>("/facility")
+          .then((facility) => setBarangayName(facility.barangay_name))
+          .catch(() => setBarangayName(""));
+        refresh();
+      });
+    };
+    routeByRole();
+    window.addEventListener("healthsync-auth-change", routeByRole);
+    return () => {
+      active = false;
+      window.removeEventListener("healthsync-auth-change", routeByRole);
+    };
+  }, [refresh, router]);
   const filtered = patients.filter((patient) =>
     patient.full_name.toLowerCase().includes(search.toLowerCase()),
   );
@@ -112,7 +134,7 @@ export default function DashboardPage() {
           </Link>
           <div className="flex items-center gap-3">
             <span className="hidden text-sm text-white/80 sm:block">
-              Barangay health workspace
+              {barangayName ? `${barangayName} health workspace` : "Barangay health workspace"}
             </span>
             <div className="relative">
               <button
@@ -179,15 +201,13 @@ export default function DashboardPage() {
           <div>
             <p className="text-sm font-medium text-teal">Community care</p>
             <h1 className="mt-1 text-3xl font-bold tracking-tight">
-              Good day!
+              Hi! Health Worker.
             </h1>
             <p className="mt-2 text-sm text-black/60">
-              Here’s what needs your attention.
+              How may I help you today?
             </p>
           </div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-canvas px-3 py-2 text-xs text-black/60">
-            <ShieldCheck size={15} className="text-teal" /> Secure facility view
-          </span>
+          <EntryForms onSaved={refresh} />
         </div>
         {error && (
           <div
@@ -370,7 +390,6 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <EntryForms onSaved={refresh} />
         <PublicHealthPanel
           analytics={analytics}
           analyticsError={analyticsError}

@@ -6,7 +6,7 @@ import { downloadFile } from "@/lib/api";
 
 type Format = "xlsx" | "csv";
 
-/** Current month in Manila (UTC+8) as YYYY-MM, matching the backend's default. */
+
 function currentMonth(): string {
   return new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 7);
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { LogIn, LogOut, X } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabase";
 
@@ -13,6 +14,7 @@ export default function AuthControl({
   inverse?: boolean;
   showSignUp?: boolean;
 }) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState("");
@@ -47,9 +49,10 @@ export default function AuthControl({
     setBusy(true);
     try {
       const supabase = getSupabaseClient();
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       setOpen(false);
+      router.replace(data.session?.user.app_metadata?.facility_role === "municipal_admin" ? "/municipal" : "/dashboard");
     } catch (error) {
       setMessage(
         error instanceof Error

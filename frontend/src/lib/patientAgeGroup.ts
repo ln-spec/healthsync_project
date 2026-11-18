@@ -11,6 +11,7 @@ export function getPatientAgeGroup(dob: string): string {
 
   if (age < 0) return "Age unavailable";
   if (age < 2) return "Infant";
+  if (age <= 3) return "Toddler";
   if (age <= 12) return "Child";
   if (age <= 17) return "Teen";
   if (age >= 60) return "Senior";

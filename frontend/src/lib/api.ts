@@ -117,3 +117,40 @@ export interface TodayVisitCount {
   date: string;
   count: number;
 }
+
+export interface MunicipalDashboard {
+  municipality_id: string;
+  municipality_name: string;
+  facility_count: number;
+  generated_at: string;
+  patient_counts: {
+    total: number;
+    by_age_group: Array<{ type: string; count: number }>;
+    by_barangay: Array<{ facility_id: string; barangay_name: string; count: number }>;
+  };
+  public_health: {
+    period_days: number;
+    current_visits: number;
+    previous_visits: number;
+    unique_patients: number;
+    previous_unique_patients: number;
+    diagnosis_categories: number;
+    diagnoses: Array<{ name: string; count: number; previous_count: number; change_percent: number | null }>;
+    increased_reports: Array<{ name: string; count: number; previous_count: number; change_percent: number | null }>;
+    weekly_visits: Array<{ week_start: string; count: number }>;
+  };
+  inventory: Array<{
+    facility_id: string;
+    barangay_name: string;
+    medicine_name: string;
+    stock_quantity: number;
+    reorder_threshold: number;
+    low_stock: boolean;
+  }>;
+  low_stock_count: number;
+}
+
+export interface FacilityInfo {
+  facility_id: string;
+  barangay_name: string;
+}
