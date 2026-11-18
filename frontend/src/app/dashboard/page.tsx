@@ -179,15 +179,13 @@ export default function DashboardPage() {
           <div>
             <p className="text-sm font-medium text-teal">Community care</p>
             <h1 className="mt-1 text-3xl font-bold tracking-tight">
-              Good day!
+              Hi! Health Worker.
             </h1>
             <p className="mt-2 text-sm text-black/60">
-              Here’s what needs your attention.
+              How may I help you today?
             </p>
           </div>
-          <span className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-canvas px-3 py-2 text-xs text-black/60">
-            <ShieldCheck size={15} className="text-teal" /> Secure facility view
-          </span>
+          <EntryForms onSaved={refresh} />
         </div>
         {error && (
           <div
@@ -370,7 +368,6 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        <EntryForms onSaved={refresh} />
         <PublicHealthPanel
           analytics={analytics}
           analyticsError={analyticsError}

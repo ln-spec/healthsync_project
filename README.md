@@ -12,7 +12,7 @@ frontend/   Next.js + TypeScript + Tailwind
   src/app/   Pages and layout
   src/lib/   Supabase/API helpers
   package.json
-  .env.local
+  .env.example
 ```
 
 ## Setup
@@ -27,4 +27,6 @@ frontend/   Next.js + TypeScript + Tailwind
    cd frontend
    npm install
    npm run dev
+   or
+   npm run dev -- --hostname 127.0.0.1 --port 3000
    ```

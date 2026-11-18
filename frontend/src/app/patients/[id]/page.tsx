@@ -7,12 +7,12 @@ import {
   Activity,
   ArrowLeft,
   CalendarDays,
+  ChevronDown,
   FileImage,
   Pencil,
   Save,
   Syringe,
   Upload,
-  X,
 } from "lucide-react";
 import { api, type Patient } from "@/lib/api";
 import { getApiHeaders } from "@/lib/supabase";
@@ -56,7 +56,8 @@ export default function PatientPage() {
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [vaccines, setVaccines] = useState<Vaccination[]>([]);
   const [savedImages, setSavedImages] = useState<DiagnosticImage[]>([]);
-  const [uploadsOpen, setUploadsOpen] = useState(false);
+  const [imagesLoading, setImagesLoading] = useState(true);
+  const [imagesExpanded, setImagesExpanded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [notesEditing, setNotesEditing] = useState(false);
   const [notesDraft, setNotesDraft] = useState("");
@@ -69,6 +70,7 @@ export default function PatientPage() {
   const [message, setMessage] = useState("");
   useEffect(() => {
     const load = () => {
+      setImagesLoading(true);
       Promise.allSettled([
         api<Patient>(`/patients/${params.id}`),
         api<MedicalRecord[]>(`/patients/${params.id}/medical-records`),
@@ -82,6 +84,7 @@ export default function PatientPage() {
               setRecords([]);
               setVaccines([]);
               setSavedImages([]);
+              setImagesLoading(false);
               setPageError(
                 `Patient details are unavailable: ${errorMessage(patientResult.reason)}`,
               );
@@ -112,6 +115,7 @@ export default function PatientPage() {
               setSavedImages([]);
               setImagesError(errorMessage(imagesResult.reason));
             }
+            setImagesLoading(false);
           },
         );
     };
@@ -147,16 +151,6 @@ export default function PatientPage() {
     } finally {
       event.target.value = "";
       setUploading(false);
-    }
-  }
-  async function openUploads() {
-    setUploadsOpen(true);
-    setImagesError("");
-    try {
-      const latest = await api<DiagnosticImage[]>(`/patients/${params.id}/diagnostic-images`);
-      setSavedImages((current) => mergeImages(current, latest));
-    } catch (error) {
-      setImagesError(errorMessage(error));
     }
   }
   async function savePatientNotes() {
@@ -322,11 +316,58 @@ export default function PatientPage() {
                       onChange={uploadImage}
                     />
                   </label>
-                  <div className="mt-3 flex items-center justify-between gap-3"><p role="status" className="min-w-0 truncate text-xs text-black/60">{message || imagesError}</p><button type="button" onClick={openUploads} className="shrink-0 rounded-lg border border-blue/20 bg-white px-3 py-2 text-sm font-semibold text-blue hover:bg-blue/5">Uploads ({savedImages.length})</button></div>
+                  <div className="mt-2 flex justify-center">
+                    <button
+                      type="button"
+                      aria-label={`${imagesExpanded ? "Hide" : "Show"} diagnostic images`}
+                      aria-expanded={imagesExpanded}
+                      aria-controls="diagnostic-images-panel"
+                      onClick={() => setImagesExpanded((expanded) => !expanded)}
+                    >
+                      <ChevronDown
+                        size={24}
+                        className={`transition-transform duration-200 ${imagesExpanded ? "rotate-180" : ""}`}
+                      />
+                    </button>
+                  </div>
+                  {message && <p role="status" className="mt-3 text-xs text-black/60">{message}</p>}
+                  <div
+                    id="diagnostic-images-panel"
+                    hidden={!imagesExpanded}
+                  >
+                    {imagesError && <p role="status" className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-700">{imagesError}</p>}
+                    {imagesLoading ? (
+                      <p className="mt-4 text-sm text-black/60">Loading diagnostic images…</p>
+                    ) : savedImages.length ? (
+                      <div className="mt-4 grid max-h-64 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3">
+                        {savedImages.map((image) => (
+                          <a
+                            key={image.id}
+                            href={image.image_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="group overflow-hidden rounded-xl border border-black/10 bg-white focus:outline-none focus:ring-2 focus:ring-blue"
+                          >
+                            <img
+                              src={image.image_url}
+                              alt={`Diagnostic upload from ${new Date(image.uploaded_at).toLocaleDateString()}`}
+                              className="aspect-square w-full object-cover transition group-hover:scale-[1.02]"
+                            />
+                            <p className="truncate px-3 py-2 text-xs text-black/60">
+                              Uploaded {new Date(image.uploaded_at).toLocaleDateString()}
+                            </p>
+                          </a>
+                        ))}
+                      </div>
+                    ) : !imagesError ? (
+                      <p className="mt-4 rounded-xl bg-white p-4 text-center text-sm text-black/60">
+                        No images have been uploaded for this patient.
+                      </p>
+                    ) : null}
+                  </div>
                 </section>
               </div>
             </div>
-            {uploadsOpen && <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/50 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) setUploadsOpen(false); }}><section role="dialog" aria-modal="true" aria-labelledby="uploads-title" className="my-6 max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white p-5 shadow-card sm:p-7"><div className="flex items-start justify-between gap-4"><div><h2 id="uploads-title" className="text-xl font-bold text-blue">Uploaded diagnostic images</h2><p className="mt-1 text-sm text-black/60">{savedImages.length} image{savedImages.length === 1 ? "" : "s"} for {patient.full_name}</p></div><button type="button" aria-label="Close uploads" onClick={() => setUploadsOpen(false)} className="rounded-full p-2 text-blue hover:bg-canvas"><X size={18}/></button></div>{imagesError && <p role="status" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{imagesError}</p>}{savedImages.length ? <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">{savedImages.map((image) => <a key={image.id} href={image.image_url} target="_blank" rel="noreferrer" className="group overflow-hidden rounded-xl border border-black/10 bg-canvas focus:outline-none focus:ring-2 focus:ring-blue"><img src={image.image_url} alt={`Diagnostic upload from ${new Date(image.uploaded_at).toLocaleDateString()}`} className="aspect-square w-full object-cover transition group-hover:scale-[1.02]"/><p className="truncate px-3 py-2 text-xs text-black/60">Uploaded {new Date(image.uploaded_at).toLocaleDateString()}</p></a>)}</div> : !imagesError ? <p className="mt-5 rounded-xl bg-canvas p-8 text-center text-sm text-black/60">No images have been uploaded for this patient.</p> : null}</section></div>}
           </>
         ) : (
           <div className="rounded-2xl bg-canvas p-8 text-sm text-black/60">

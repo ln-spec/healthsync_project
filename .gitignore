@@ -1,11 +1,14 @@
 # Backend
 backend/.venv/
+backend/.venv313/
 backend/__pycache__/
 backend/.env
+backend/.env.local
 
 # Frontend
 frontend/node_modules/
 frontend/.next/
+frontend/.env
 frontend/.env.local
 
 # PyCharm
