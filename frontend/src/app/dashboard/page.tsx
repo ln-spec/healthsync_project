@@ -301,219 +301,155 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <aside className="mb-6 rounded-2xl border border-black/10 bg-canvas p-4 shadow-card lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:mb-0 lg:flex lg:w-56 lg:flex-col lg:overflow-y-auto lg:rounded-none lg:border-y-0 lg:border-l-0 lg:border-r lg:p-4 lg:shadow-none">
-        <Link
-          href="/"
-          className="mb-5 hidden items-center gap-2.5 border-b border-black/10 pb-4 lg:flex"
-        >
-          <span className="grid size-8 place-items-center rounded-lg bg-blue/10 text-blue">
-            <Activity size={17} />
-          </span>
-          <span className="text-base font-bold text-blue">HealthSync</span>
-        </Link>
-        <nav
-          aria-label="Dashboard sections"
-          className="flex gap-2 overflow-x-auto lg:flex-col lg:gap-3 lg:overflow-visible"
-        >
-          {[
-            { id: "patient-records", label: "Patient records", icon: <Users size={17} /> },
-            { id: "patient-lookup", label: "Patient lookup & available medicine", icon: <Search size={17} /> },
-            { id: "recent-visits", label: "Recent patient visits", icon: <Activity size={17} /> },
-            { id: "facility-overview", label: "Facility overview", icon: <Warehouse size={17} /> },
-            { id: "monthly-report", label: "Monthly report export", icon: <FileSpreadsheet size={17} /> },
-          ].map(({ id, label, icon }) => (
-            <a
-              key={id}
-              href={`#${id}`}
-              className="group flex shrink-0 items-center gap-2 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-black/70 transition hover:border-accent/40 hover:bg-accent/[0.14] hover:text-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-strong lg:w-full lg:whitespace-normal lg:px-3 lg:py-2.5"
-            >
-              <span className="shrink-0 text-accent transition group-hover:text-accent">
-                {icon}
-              </span>
-              <span>{label}</span>
-            </a>
-          ))}
-        </nav>
-        <div className="mt-4 border-t border-black/10 pt-4 lg:mt-auto">
-          <AuthControl showSignUp={false} />
+      <div className="mx-auto max-w-7xl px-6 py-9">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-teal">Community care</p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight">
+              Hi! Health Worker.
+            </h1>
+            <p className="mt-2 text-sm text-black/60">
+              How may I help you today?
+            </p>
+          </div>
+          <EntryForms onSaved={refresh} />
         </div>
-      </aside>
+        {error && (
+          <div
+            role="status"
+            className="mt-6 rounded-xl border border-blue/20 bg-canvas p-4 text-sm text-black"
+          >
+            {error}
+          </div>
+        )}
+        <section className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Stat
+            icon={<Users />}
+            label="Patient records"
+            value={String(patients.length)}
+            detail="Recent records"
+          />
+          <Stat
+            icon={<Warehouse />}
+            label="Medicine types"
+            value={String(inventory.length)}
+            detail="Available in facility"
+          />
+          <Stat
+            icon={<Activity />}
+            label="Visits today"
+            value={visitsToday === null ? "—" : String(visitsToday)}
+            detail="Visit date · Manila time"
+          />
+          <Stat
+            icon={<Users />}
+            label="Patients seen"
+            value={analytics ? String(analytics.unique_patients) : "—"}
+            detail="Unique patients · last 30 days"
+          />
+        </section>
 
-      <div className="mx-auto max-w-7xl px-6 py-9 lg:ml-64 lg:mr-auto">
-            <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="mt-7 grid gap-6 lg:grid-cols-[1.3fr_.7fr]">
+          <section className="flex h-[36rem] min-h-0 flex-col rounded-2xl border border-black/10 bg-canvas p-6 shadow-card">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-medium text-accent-strong">Community care</p>
-                <h1 className="mt-1 text-3xl font-bold tracking-tight">
-                  Hi! Health Worker.
-                </h1>
-                <p className="mt-2 text-sm text-black/60">
-                  How may I help you today?
+                <h2 className="text-lg font-bold">Patient lookup</h2>
+                <p className="mt-1 text-sm text-black/60">
+                  Search your facility’s patient directory.
                 </p>
               </div>
-              <EntryForms onSaved={onPatientSaved} />
-            </div>
-            {error && (
-              <div
-                role="status"
-                className="mt-6 rounded-xl border border-accent/40 bg-canvas p-4 text-sm text-black"
-              >
-                {error}
+              <div className="relative">
+                <Search
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40"
+                  size={17}
+                />
+                <input
+                  aria-label="Search patients"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search name"
+                  className="w-56 rounded-xl border border-black/10 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-teal"
+                />
               </div>
-            )}
-            <section
-              id="patient-records"
-              className="mt-7 scroll-mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
-            >
-              <Stat
-                icon={<Users />}
-                label="Patient records"
-                value={patientTotal === null ? "—" : patientTotal.toLocaleString()}
-                detail={patientCountError ? "Total temporarily unavailable" : "Recent records"}
-              />
-              <Stat
-                icon={<Warehouse />}
-                label="Medicine types"
-                value={String(inventory.length)}
-                detail="Available in facility"
-              />
-              <Stat
-                icon={<Activity />}
-                label="Visits today"
-                value={visitsToday === null ? "—" : String(visitsToday)}
-                detail="Visit date · Manila time"
-              />
-              <Stat
-                icon={<Users />}
-                label="Patients seen"
-                value={analytics ? String(analytics.unique_patients) : "—"}
-                detail="Unique patients · last 30 days"
-              />
-            </section>
-
-            <div
-              id="patient-lookup"
-              className="mt-7 scroll-mt-6 grid gap-6 lg:grid-cols-[1.3fr_.7fr]"
-            >
-              <section className="flex h-[36rem] min-h-0 flex-col rounded-2xl border border-black/10 bg-canvas p-6 shadow-card">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h2 className="text-lg font-bold">Patient lookup</h2>
-                    <p className="mt-1 text-sm text-black/60">
-                      Search your facility’s patient directory.
-                    </p>
-                  </div>
-                  <div className="relative">
-                    <Search
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40"
-                      size={17}
-                    />
-                    <input
-                      aria-label="Search patients"
-                      value={search}
-                      onChange={(event) => setSearch(event.target.value)}
-                      placeholder="Search name"
-                      className="w-56 rounded-xl border border-black/10 bg-white py-2.5 pl-9 pr-3 text-sm outline-none focus:border-accent-strong"
-                    />
-                  </div>
-                </div>
-                <div
-                  ref={patientListRef}
-                  onScroll={(event) => {
-                    const element = event.currentTarget;
-                    if (element.scrollHeight - element.scrollTop - element.clientHeight < 100) {
-                      void loadMorePatients();
-                    }
-                  }}
-                  className="mt-5 min-h-0 flex-1 divide-y divide-black/10 overflow-y-auto overscroll-contain pr-1"
-                >
-                  {patients.length ? (
-                    patients.map((patient) => (
-                      <Link
-                        href={`/patients/${patient.id}`}
-                        key={patient.id}
-                        className="flex items-center justify-between py-4 hover:bg-white"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="grid size-10 place-items-center rounded-full bg-accent/15 font-semibold text-accent-strong">
-                            {patient.full_name
-                              .split(" ")
-                              .map((part) => part[0])
-                              .slice(0, 2)
-                              .join("")
-                              .toUpperCase()}
-                          </span>
-                          <div>
-                            <div className="flex flex-wrap items-center gap-2"><p className="font-semibold">{patient.full_name}</p><span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-semibold text-accent-strong">{getPatientAgeGroup(patient.dob)}</span></div>
-                            <p className="text-xs text-black/60">
-                              DOB {patient.dob} · {patient.gender}
-                            </p>
-                          </div>
-                        </div>
-                        <ArrowUpRight size={18} className="text-black/40" />
-                      </Link>
-                    ))
-                  ) : (
-                    <p className="py-8 text-center text-sm text-black/60">
-                      {patientLoading
-                        ? "Loading patient records…"
-                        : patientError
-                          ? `Patient data unavailable: ${patientError}`
-                          : "No matching patient records"}
-                    </p>
-                  )}
-                  {patients.length > 0 && patientLoading && (
-                    <p className="py-4 text-center text-xs text-black/50">Loading more patients…</p>
-                  )}
-                  {patients.length > 0 && patientError && (
-                    <p role="status" className="py-4 text-center text-xs text-red-700">Could not load more patients: {patientError}</p>
-                  )}
-                  {patients.length > 0 && !patientHasMore && (
-                    <p className="py-4 text-center text-xs text-black/40">All matching patients are loaded.</p>
-                  )}
-                </div>
-              </section>
-              <section className="rounded-2xl border border-black/10 bg-canvas p-6 shadow-card">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="text-lg font-bold">Available medicine</h2>
-                    <p className="mt-1 text-sm text-black/60">
-                      Current facility stock counts
-                    </p>
-                  </div>
-                  <Warehouse className="text-accent" />
-                </div>
-                <div className="mt-5 max-h-80 space-y-2 overflow-y-auto">
-                  {inventory.length ? (
-                    inventory.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between gap-3 rounded-xl border border-black/10 bg-white px-4 py-3"
-                      >
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold">
-                            {item.medicine_name}
-                          </p>
-                          <p className="mt-1 text-xs text-black/60">
-                            Reorder level: {item.reorder_threshold}
-                          </p>
-                        </div>
-                        <span
-                          className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${item.stock_quantity <= item.reorder_threshold ? "bg-accent/20 text-accent-strong" : "bg-canvas text-black"}`}
-                        >
-                          {item.stock_quantity} in stock
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="rounded-xl bg-white p-4 text-sm text-black/60">
-                      {error
-                        ? "Inventory data unavailable"
-                        : "No medicine has been added yet."}
-                    </p>
-                  )}
-                </div>
-              </section>
             </div>
+            <div className="mt-5 min-h-0 flex-1 divide-y divide-black/10 overflow-y-auto overscroll-contain pr-1">
+              {filtered.length ? (
+                filtered.map((patient) => (
+                  <Link
+                    href={`/patients/${patient.id}`}
+                    key={patient.id}
+                    className="flex items-center justify-between py-4 hover:bg-white"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="grid size-10 place-items-center rounded-full bg-mint font-semibold text-teal">
+                        {patient.full_name
+                          .split(" ")
+                          .map((part) => part[0])
+                          .slice(0, 2)
+                          .join("")
+                          .toUpperCase()}
+                      </span>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2"><p className="font-semibold">{patient.full_name}</p><span className="rounded-full bg-blue/10 px-2 py-0.5 text-[10px] font-semibold text-blue">{getPatientAgeGroup(patient.dob)}</span></div>
+                        <p className="text-xs text-black/60">
+                          DOB {patient.dob} · {patient.gender}
+                        </p>
+                      </div>
+                    </div>
+                    <ArrowUpRight size={18} className="text-black/40" />
+                  </Link>
+                ))
+              ) : (
+                <p className="py-8 text-center text-sm text-black/60">
+                  {error
+                    ? "Patient data unavailable"
+                    : "No matching patient records"}
+                </p>
+              )}
+            </div>
+          </section>
+          <section className="rounded-2xl border border-black/10 bg-canvas p-6 shadow-card">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-bold">Available medicine</h2>
+                <p className="mt-1 text-sm text-black/60">
+                  Current facility stock counts
+                </p>
+              </div>
+              <Warehouse className="text-teal" />
+            </div>
+            <div className="mt-5 max-h-80 space-y-2 overflow-y-auto">
+              {inventory.length ? (
+                inventory.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-black/10 bg-white px-4 py-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">
+                        {item.medicine_name}
+                      </p>
+                      <p className="mt-1 text-xs text-black/60">
+                        Reorder level: {item.reorder_threshold}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${item.stock_quantity <= item.reorder_threshold ? "bg-blue/10 text-blue" : "bg-canvas text-black"}`}
+                    >
+                      {item.stock_quantity} in stock
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="rounded-xl bg-white p-4 text-sm text-black/60">
+                  {error
+                    ? "Inventory data unavailable"
+                    : "No medicine has been added yet."}
+                </p>
+              )}
+            </div>
+          </section>
+        </div>
 
             <section
               id="recent-visits"
