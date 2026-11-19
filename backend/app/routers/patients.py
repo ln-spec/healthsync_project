@@ -24,6 +24,20 @@ def list_patients(q: str | None = Query(default=None, max_length=100), limit: in
     return [PatientRead.model_validate(row) for row in query.execute().data]
 
 
+@router.get("/count")
+def count_patients(client: Client = Depends(get_authenticated_client), facility_id: str = Depends(require_facility_id)) -> dict[str, int]:
+    result = (
+        client.table("patients")
+        .select("id", count="exact")
+        .eq("barangay_id", facility_id)
+        .limit(1)
+        .execute()
+    )
+    if result.count is None:
+        raise HTTPException(status_code=502, detail="Patient count could not be retrieved")
+    return {"count": result.count}
+
+
 @router.post("", response_model=PatientRead, status_code=status.HTTP_201_CREATED)
 def create_patient(payload: PatientCreate, client: Client = Depends(get_authenticated_client), facility_id: str = Depends(require_facility_id)) -> PatientRead:
     row = client.table("patients").insert({**payload.model_dump(mode="json"), "barangay_id": facility_id}).execute().data

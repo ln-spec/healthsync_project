@@ -5,7 +5,7 @@ from supabase import Client
 
 from app.database import get_authenticated_client, get_service_role_client
 from app.dependencies import require_municipality_id
-from app.services.municipal_service import get_municipal_age_groups
+from app.services.municipal_service import get_municipal_patient_counts
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/municipal", tags=["municipal"])
@@ -27,10 +27,7 @@ def municipal_dashboard(
             raise ValueError("Municipal dashboard returned an unexpected response")
         if str(response.data.get("municipality_id", "")).lower() != municipality_id.lower():
             raise ValueError("Municipal dashboard scope did not match the authenticated user")
-        patient_counts = response.data.get("patient_counts")
-        if not isinstance(patient_counts, dict):
-            raise ValueError("Municipal dashboard patient counts were missing")
-        patient_counts["by_age_group"] = get_municipal_age_groups(
+        response.data["patient_counts"] = get_municipal_patient_counts(
             get_service_role_client(), municipality_id
         )
         return response.data
